@@ -17,13 +17,13 @@ namespace Simulator_I.AI
             Mental = 100;
         }
 
-        public void ChanceEnergy(int value)
+        public void ChangeEnergy(int value)
         {
             Energy += value;
             if (Energy > 100) Energy = 100;
             if (Energy < 0) Energy = 0;
         }
-        public void ChanceMental(int value)
+        public void ChangeMental(int value)
         {
             Mental += value;
             if (Mental > 100) Mental = 100;
