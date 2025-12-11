@@ -9,7 +9,7 @@ namespace Simulator_I.AI
     public class Lesson
     {
 
-            public string Day { get; set; }       //Pondelok, Utorok, Streda, Štvrtok, Piatok
+        public string Day { get; set; }       //Pondelok, Utorok, Streda, Štvrtok, Piatok
         public int Hour { get; set; }            //1-7
         public string Predmet { get; set; }     //Vyucovaie predmety
         public string Ucitel { get; set; }     //Meno ucitela
