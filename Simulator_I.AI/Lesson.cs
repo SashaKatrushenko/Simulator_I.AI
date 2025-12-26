@@ -14,10 +14,10 @@ namespace Simulator_I.AI
         public string Predmet { get; set; }     //Vyucovaie predmety
         public string Ucitel { get; set; }     //Meno ucitela
 
-        public int ChanceTest { get; set; }    //Sanca na test v %
-        public int ChanceDU { get; set; }      //Sanca na domacu uciu v %
-        public int ChanceNic { get; set; }     //Sanca na nic v %
-        public int ChanceZastup { get; set; }   //Sanca na zastup v %
+        public int ChanceTest { get; set; }   
+        public int ChanceDU { get; set; }   
+        public int ChanceNic { get; set; }    
+        public int ChanceZastup { get; set; }   
 
         public Lesson(string day, int hour, string predmet, string ucitel,
                           int chanceTest, int chanceDU, int chanceNic, int chanceZastup)

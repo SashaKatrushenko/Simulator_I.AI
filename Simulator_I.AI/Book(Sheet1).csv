@@ -3,7 +3,7 @@ Pondelok,1,ANJ,Copeland,10,50,25,15,0
 Pondelok,2,TSV,Drexler,0,0,70,30,0
 Pondelok,3,CEL,Sovik,15,35,40,10,0
 Pondelok,4,MAT,Oriescikova,25,35,20,20,0
-Pondelok,5,TCK,Hlavata,5,30,45,10,0
+Pondelok,5,TCK,Hlavata,5,30,45,20,0
 Pondelok,6,SJL,Birova,30,10,35,25,0
 Pondelok,7,ZIG,Jendryscik,15,5,70,10,0
 Utorok,1,ODK,Hlavata,15,0,80,5,0
@@ -13,12 +13,12 @@ Utorok,4,ELK,Sovik,30,20,40,10,0
 Utorok,5,SJL,Birova,30,10,35,25,0
 Utorok,6,FYZ,Choma,20,5,65,10,0
 Utorok,7,ETV,Makka,0,0,100,0,0
-Streda,1,Prax,Michal/Igor,0,0,0,0,0
-Streda,2,Prax,Michal/Igor,0,0,0,0,0
-Streda,3,Prax,Michal/Igor,0,0,0,0,0
-Streda,4,Prax,Michal/Igor,0,0,0,0,0
-Streda,5,Prax,Michal/Igor,0,0,0,0,0
-Streda,6,Prax,Michal/Igor,0,0,0,0,0
+Streda,1,Prax,Michal/Igor,0,0,0,100,0
+Streda,2,Prax,Michal/Igor,0,0,0,100,0
+Streda,3,Prax,Michal/Igor,0,0,0,100,0
+Streda,4,Prax,Michal/Igor,0,0,0,100,0
+Streda,5,Prax,Michal/Igor,0,0,0,100,0
+Streda,6,Prax,Michal/Igor,0,0,0,100,0
 Streda,7,SJL,Birova,30,10,35,25,0
 Stvrtok,1,ZIG,Jendryscik,15,5,70,10,0
 Stvrtok,2,MAT,Oriescikova,25,35,20,20,0
