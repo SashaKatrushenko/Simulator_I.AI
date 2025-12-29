@@ -200,11 +200,12 @@ namespace Simulator_I.AI
 
         private void Nic(Player player, Random random)
         {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Je normalna hodina");
             int chanceTabula = 20;
-            int tabulaRoll = random.Next(1, 100);
-            if (chanceTabula <= chanceTabula)
+            int tabulaRoll = random.Next(1, 101);
+            if (tabulaRoll <= chanceTabula)
             {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Ucitel ta vyvolal ku tabule! Vimysli si nieco...");
                 Console.WriteLine("1. Pytat spoluziakov o pomoc -5e -5m");
                 Console.WriteLine("2. Vimyslat -5e");
