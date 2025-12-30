@@ -5,16 +5,49 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Xml.Linq;
 
 namespace Simulator_I.AI
 {
     internal class Game
     {
+        private string ReadOption(params string[] validOptions)
+        {
+            var valid = validOptions.Select(v => v.Trim().ToLower()).ToArray();
+            while (true)
+            {
+                string input = Console.ReadLine()?.Trim().ToLower();
+                if (string.IsNullOrEmpty(input))
+                {
+                  //  Console.WriteLine();
+                }
+                if (valid.Contains(input))
+                {
+                    return input;
+                }
+                Console.WriteLine($"Zla volba. Moznosti: {string.Join(", ", validOptions)} Skus znova");
+            }
+        }
+
+        private void WaitForEnter(string prompt = "Enter pre pokracovanie")
+        {
+            Console.WriteLine(prompt);
+            while (true)
+            {
+                var key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    
+                    break;
+                }
+            }
+        }
+
         List<Lesson> lessons = new List<Lesson>();
         Random random = new Random();
         public void Start()
         {
-
+            
             Player player = new Player();
             string fileName = "Book(Sheet1).csv";
             string[] lines = File.ReadAllLines(fileName);
@@ -74,7 +107,7 @@ namespace Simulator_I.AI
                     }
                     Console.WriteLine("Hodina " + hod + ": " + aktualna.Predmet);
 
-
+                    //EVENTY 
                     int roll = random.Next(1, 101);
                     if (roll <= aktualna.ChanceTest)
                     {
@@ -86,7 +119,7 @@ namespace Simulator_I.AI
                     }
                     else if (roll <= aktualna.ChanceDU + aktualna.ChanceTest + aktualna.ChanceNic)
                     {
-                        Nic(player, random);
+                        Nic(player, aktualna, random);
                     }
                     else
                     {
@@ -144,8 +177,9 @@ namespace Simulator_I.AI
                 Console.WriteLine("Energia: " + player.Energy);
                 Console.WriteLine("Mental: " + player.Mental);
                 Console.WriteLine("Enter pre pokracovanie");
-                Console.ReadLine();
+                WaitForEnter();
         }
+
 
 
 
@@ -164,15 +198,29 @@ namespace Simulator_I.AI
             Console.WriteLine("Energia: " + player.Energy);
             Console.WriteLine("Mental: " + player.Mental);
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("Mas test!");
+            Console.WriteLine("Pisete patminutovku");
             Console.WriteLine("1. Odpisat na teste (-20 energie. 70% sansa na dobru znamku) 2. Skusit sam (30% sansa na dobru znamku)");
-            string volba = Console.ReadLine();
+            string volba = ReadOption("1", "2");
             Console.ResetColor();
             if (volba == "1")
             {
                 player.ChangeEnergy(-20);
                 int chanceZnamka1 = random.Next(1, 100);
                 if (chanceZnamka1 <= 70)
+                {
+                    Console.WriteLine("Dostavas dobru znamku! +20 mental");
+                    player.ChangeMental(20);
+                }
+                else
+                {
+                    Console.WriteLine("Dostavas zlu znamku! (-20 mental)");
+                    player.ChangeMental(-20);
+                }
+            }
+            if (volba == "2")
+            {
+                int chanceZnamka = random.Next(1, 100);
+                if (chanceZnamka <= 30)
                 {
                     Console.WriteLine("Dostavas dobru znamku! +20 mental");
                     player.ChangeMental(20);
@@ -191,41 +239,45 @@ namespace Simulator_I.AI
             Console.WriteLine("Mas domacu ulohu!");
             Console.WriteLine("1-Spravit du (-10 energie)/ 2-nespravit du (mental -15)");
             Console.ResetColor();
-            string volba = Console.ReadLine();
+            string volba = ReadOption("1", "2");
             if (volba == "1")
                 player.ChangeEnergy(-10);
             else if (volba == "2")
                 player.ChangeMental(-15);
         }
 
-        private void Nic(Player player, Random random)
+        private void Nic(Player player, Lesson aktualna, Random random) 
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Je normalna hodina");
-            int chanceTabula = 20;
-            int tabulaRoll = random.Next(1, 101);
-            if (tabulaRoll <= chanceTabula)
+            if (aktualna.Predmet != "TSV") //tu som pytala chatgpt co mam spravit lebo nejslo mi najst "aktualna" v tejto metode
             {
-                Console.WriteLine("Ucitel ta vyvolal ku tabule! Vimysli si nieco...");
-                Console.WriteLine("1. Pytat spoluziakov o pomoc -5e -5m");
-                Console.WriteLine("2. Vimyslat -5e");
-                Console.WriteLine("3. Povedat pravdu -15m");
-                Console.ResetColor();
-                string choice = Console.ReadLine();
-                if (choice == "1")
+                int chanceTabula = 30;
+                int tabulaRoll = random.Next(1, 101);
+                if (tabulaRoll <= chanceTabula)
                 {
-                    player.ChangeMental(-5);
-                    player.ChangeEnergy(-5);
-                }
-                else if (choice == "2")
-                {
-                    player.ChangeEnergy(-5);
-                }
-                else if (choice == "3")
-                {
-                    player.ChangeMental(-15);
-                }
+                    Console.WriteLine("Ucitel ta vyvolal ku tabule! Vimysli si nieco...");
+                    Console.WriteLine("1. Pytat spoluziakov o pomoc -5e -5m");
+                    Console.WriteLine("2. Vimyslat -5e");
+                    Console.WriteLine("3. Povedat ze nevies -15m");
+                    Console.ResetColor();
+                    string choice = ReadOption("1", "2", "3");
+                    if (choice == "1")
+                    {
+                        player.ChangeMental(-5);
+                        player.ChangeEnergy(-5);
+                    }
+                    else if (choice == "2")
+                    {
+                        player.ChangeEnergy(-5);
+                    }
+                    else if (choice == "3")
+                    {
+                        player.ChangeMental(-15);
+                    }
+                }         
             }
+            Console.ResetColor();
         }
 
         private void Zastup(Player player)
@@ -234,7 +286,7 @@ namespace Simulator_I.AI
             Console.WriteLine("Ucitel tu nie je - zastup!");
             Console.WriteLine("1. Spat +20 energie 2. Hrat na mobile +20 mentalu");
             Console.ResetColor();
-            string volba = Console.ReadLine();
+            string volba = ReadOption("1", "2");
             if (volba == "1")
                 player.ChangeEnergy(20);
             else if (volba == "2")
