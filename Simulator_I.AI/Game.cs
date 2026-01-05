@@ -75,7 +75,7 @@ namespace Simulator_I.AI
                 lessons.Add(lesson);
                 int sum = sanceTest + sanceDu + sanceNic + sanceZastup;
 
-                //Tu mi poradil kamarat ze mam spravit kontrolu ci je suma sanci 100% 
+                //Tu mi poradil kamarat ze mam spravit kontrolu ci je suma 100% 
                 if (sum != 100)
                 {
                     Console.WriteLine($"\nSucet sansi nie je 100%. Riadok {parts[0]}, predmet {parts[2]}");
@@ -85,6 +85,9 @@ namespace Simulator_I.AI
 
             string[] dni = { "Pondelok", "Utorok", "Streda", "Stvrtok", "Piatok" };
 
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Game start! Po kazdej hodine stracas 5 energie");
+            Console.ResetColor();
 
             foreach (string den in dni)
             {
@@ -107,6 +110,7 @@ namespace Simulator_I.AI
                     }
                     Console.WriteLine("Hodina " + hod + ": " + aktualna.Predmet);
 
+
                     //EVENTY 
                     int roll = random.Next(1, 101);
                     if (roll <= aktualna.ChanceTest)
@@ -115,7 +119,7 @@ namespace Simulator_I.AI
                     }
                     else if (roll <= aktualna.ChanceTest + aktualna.ChanceDU)
                     {
-                        DU(player);
+                        DU(player, random, aktualna);
                     }
                     else if (roll <= aktualna.ChanceDU + aktualna.ChanceTest + aktualna.ChanceNic)
                     {
@@ -123,9 +127,8 @@ namespace Simulator_I.AI
                     }
                     else
                     {
-                        Zastup(player);
+                        Zastup(player, aktualna);
                     }
-
 
 
                     player.ChangeEnergy(-5);
@@ -155,9 +158,7 @@ namespace Simulator_I.AI
             }
             //  Console.WriteLine("lesson nacitane: " + lessons.Count);
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Game start! Po kazdej hodine stracas 5 energie");
-            Console.ResetColor();
+           
     
             for (int day = 1; day <= 5; day++)              // Цикл по дням
             {
@@ -168,9 +169,8 @@ namespace Simulator_I.AI
                 Console.ResetColor();
                 Console.WriteLine("Player energy: " + player.Energy);
                 Console.WriteLine("Player mental: " + player.Mental);
-                
-
             }
+
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("--- KONIEC DNA " + "*day*" + " ---");
                 Console.ResetColor();
@@ -187,11 +187,6 @@ namespace Simulator_I.AI
 
 
         //METODY PRE EVENTY
-
-
-
-
-
 
         private void Test(Player player, Lesson l, Random random)
         {
@@ -233,17 +228,47 @@ namespace Simulator_I.AI
             }
         }
           
-        private void DU(Player player)
+        private void DU(Player player, Random random, Lesson aktualna)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Mas domacu ulohu!");
-            Console.WriteLine("1-Spravit du (-10 energie)/ 2-nespravit du (mental -15)");
+            Console.WriteLine("Na tuto hodinu mal si pripravit domacu ulohu");
+            Console.WriteLine("1-Spravit DU (-10 energie)");
+            Console.WriteLine("2-Nespravit DU");
             Console.ResetColor();
             string volba = ReadOption("1", "2");
+            bool spravilDU = false;
             if (volba == "1")
+            {
+                spravilDU = true;
                 player.ChangeEnergy(-10);
-            else if (volba == "2")
-                player.ChangeMental(-15);
+            }
+            else
+            {
+                spravilDU = false;
+            }
+            int kontrolaRoll = random.Next(1, 101);
+            if (kontrolaRoll <= 50)
+            {
+                Console.WriteLine(aktualna.Ucitel + " kontroluje domacu ulohu...");
+                if (spravilDU)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Všetko maš, dobra praca! +10m");
+                    Console.ResetColor();
+                    player.ChangeMental(10);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Nemáš DU, poznamka! -15m");
+                    Console.ResetColor();
+                    player.ChangeMental(-15);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Ucitel nekontroloval DU");
+            }
         }
 
         private void Nic(Player player, Lesson aktualna, Random random) 
@@ -256,34 +281,112 @@ namespace Simulator_I.AI
                 int tabulaRoll = random.Next(1, 101);
                 if (tabulaRoll <= chanceTabula)
                 {
-                    Console.WriteLine("Ucitel ta vyvolal ku tabule! Vimysli si nieco...");
-                    Console.WriteLine("1. Pytat spoluziakov o pomoc -5e -5m");
-                    Console.WriteLine("2. Vimyslat -5e");
-                    Console.WriteLine("3. Povedat ze nevies -15m");
-                    Console.ResetColor();
-                    string choice = ReadOption("1", "2", "3");
-                    if (choice == "1")
+                    if (aktualna.Predmet == "MAT")
                     {
+                        int a = random.Next(20, 100);
+                        int b = random.Next(10, 80);
+                        bool plus = random.Next(0, 2) == 0;
+
+                        int correctAnswer;
+                        if (plus)
+                        {
+                            correctAnswer = a + b;
+                            Console.WriteLine(aktualna.Ucitel + " vyvolala ta ku tabule! Vypocitaj: " + a + " + " + b);
+                        }
+                        else
+                        {
+                            if (b > a)
+                            {
+                                int temp = a;
+                                a = b;
+                                b = temp;
+                            }
+                            correctAnswer = a - b;
+                            Console.WriteLine(aktualna.Ucitel + " vyvolala ta ku tabule! Vypocitaj: " + a + " - " + b);
+                        }
+                        string odpoved = Console.ReadLine();
+                        int answer;
+                        if (int.TryParse(odpoved, out answer))
+                        {
+                            if (answer == correctAnswer)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Spravna odpoved! +10m +10e");
+                                player.ChangeEnergy(10);
+                                player.ChangeMental(10);
+                                Console.ResetColor();
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Nespravna odpoved! Spravna odpoved bola: " + correctAnswer + ". -10m -10e");
+                                player.ChangeMental(-10);
+                                player.ChangeEnergy(-10);
+                                Console.ResetColor();
+                            }
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.WriteLine("Neplatna odpoved! -10 mental");
+                            player.ChangeMental(-10);
+                            Console.ResetColor();
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine(aktualna.Ucitel + " vyvolal/a ta ku tabule! Vimysli si nieco...");
+                        Console.WriteLine("1. Pytat spoluziakov o pomoc -5e -5m");
+                        Console.WriteLine("2. Vimyslat -10e");
+                        Console.WriteLine("3. Povedat ze nevies +5e -15m");
+                        Console.ResetColor();
+                        string choice = ReadOption("1", "2", "3");
+                        if (choice == "1")
+                        {
+                            player.ChangeMental(-5);
+                            player.ChangeEnergy(-5);
+                        }
+                        else if (choice == "2")
+                        {
+                            player.ChangeEnergy(-10);
+                        }
+                        else if (choice == "3")
+                        {
+                            player.ChangeEnergy(5);
+                            player.ChangeMental(-15);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("1. Davat pozor (-5e +10m)");
+                    Console.WriteLine("2. Kreslit do zosita (+5e -5m)");
+                    Console.WriteLine("3. Bavit sa so spoluziakmi (+10e -10m)");
+                    string volba = ReadOption("1", "2", "3");
+                    if (volba == "1")
+                    {
+                        player.ChangeEnergy(-5);
+                        player.ChangeMental(10);
+                    }
+                    else if (volba == "2")
+                    {
+                        player.ChangeEnergy(5);
                         player.ChangeMental(-5);
-                        player.ChangeEnergy(-5);
                     }
-                    else if (choice == "2")
+                    else if (volba == "3")
                     {
-                        player.ChangeEnergy(-5);
+                        player.ChangeEnergy(10);
+                        player.ChangeMental(-10);
                     }
-                    else if (choice == "3")
-                    {
-                        player.ChangeMental(-15);
-                    }
-                }         
+                }
             }
             Console.ResetColor();
         }
 
-        private void Zastup(Player player)
+        private void Zastup(Player player, Lesson aktualna)
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("Ucitel tu nie je - zastup!");
+            Console.WriteLine(aktualna.Ucitel + " tu nie je - zastup!");
             Console.WriteLine("1. Spat +20 energie 2. Hrat na mobile +20 mentalu");
             Console.ResetColor();
             string volba = ReadOption("1", "2");
