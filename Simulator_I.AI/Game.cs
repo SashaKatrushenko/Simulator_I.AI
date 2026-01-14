@@ -19,7 +19,7 @@ namespace Simulator_I.AI
                 string input = Console.ReadLine()?.Trim().ToLower();
                 if (string.IsNullOrEmpty(input))
                 {
-                  //  Console.WriteLine();
+                    //  Console.WriteLine();
                 }
                 if (valid.Contains(input))
                 {
@@ -37,7 +37,7 @@ namespace Simulator_I.AI
                 var key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Enter)
                 {
-                    
+
                     break;
                 }
             }
@@ -47,7 +47,7 @@ namespace Simulator_I.AI
         Random random = new Random();
         public void Start()
         {
-            
+
             Player player = new Player();
             string fileName = "Book(Sheet1).csv";
             string[] lines = File.ReadAllLines(fileName);
@@ -75,11 +75,11 @@ namespace Simulator_I.AI
                 lessons.Add(lesson);
                 int sum = sanceTest + sanceDu + sanceNic + sanceZastup;
 
-                //Tu mi poradil kamarat ze mam spravit kontrolu ci je suma 100% 
+                //Tu mi poradil chatgpt ze mam spravit kontrolu ci je suma 100% 
                 if (sum != 100)
                 {
                     Console.WriteLine($"\nSucet sansi nie je 100%. Riadok {parts[0]}, predmet {parts[2]}");
-                  //  Console.WriteLine($"\nV riadku {+1} ma sumu {sum}%, ocakavane 100% ({lines[1]})");
+                    //  Console.WriteLine($"\nV riadku {+1} ma sumu {sum}%, ocakavane 100% ({lines[1]})");
                 }
             }
 
@@ -91,7 +91,11 @@ namespace Simulator_I.AI
 
             foreach (string den in dni)
             {
-                Console.WriteLine("=== " + den + " ===");
+                player.Energy = 100;
+                player.Mental = 100;
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("==== DEN: " + den + " ====");
+                Console.ResetColor();
                 for (int hod = 1; hod <= 7; hod++)
                 {
                     Lesson aktualna = null;
@@ -109,7 +113,6 @@ namespace Simulator_I.AI
                         continue;
                     }
                     Console.WriteLine("Hodina " + hod + ": " + aktualna.Predmet);
-
 
                     //EVENTY 
                     int roll = random.Next(1, 101);
@@ -129,9 +132,12 @@ namespace Simulator_I.AI
                     {
                         Zastup(player, aktualna);
                     }
-
-
                     player.ChangeEnergy(-5);
+                    Console.WriteLine("Player energy: " + player.Energy);
+                    Console.WriteLine("Player mental: " + player.Mental);
+                    WaitForEnter();
+
+                    //PREHRA
                     if (player.Energy <= 0)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -143,44 +149,20 @@ namespace Simulator_I.AI
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Nervove zrutenie, nezvladol si stres. Nedokazes pokracovat...GAME OVER");
-
                         Console.ResetColor();
                         return;
                     }
-                    Console.WriteLine("Player energy: " + player.Energy);
-                    Console.WriteLine("Player mental: " + player.Mental);
-
-
-                    Console.WriteLine("Enter pre pokracovanie");
-                    Console.ReadLine();
-
                 }
-            }
-            //  Console.WriteLine("lesson nacitane: " + lessons.Count);
-
-           
-    
-            for (int day = 1; day <= 5; day++)              // Цикл по дням
-            {
-                player.Energy = 100;
-                player.Mental = 100;
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("==== DEN: " + day + " ====");
-                Console.ResetColor();
-                Console.WriteLine("Player energy: " + player.Energy);
-                Console.WriteLine("Player mental: " + player.Mental);
-            }
-
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("--- KONIEC DNA " + "*day*" + " ---");
+                Console.WriteLine("--- KONIEC DNA ---");
                 Console.ResetColor();
                 Console.WriteLine("Energia: " + player.Energy);
                 Console.WriteLine("Mental: " + player.Mental);
-                Console.WriteLine("Enter pre pokracovanie");
                 WaitForEnter();
+
+            }
+            //  Console.WriteLine("lesson nacitane: " + lessons.Count)         
         }
-
-
 
 
 
@@ -227,7 +209,7 @@ namespace Simulator_I.AI
                 }
             }
         }
-          
+
         private void DU(Player player, Random random, Lesson aktualna)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -271,10 +253,16 @@ namespace Simulator_I.AI
             }
         }
 
-        private void Nic(Player player, Lesson aktualna, Random random) 
+        private void Nic(Player player, Lesson aktualna, Random random)
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Je normalna hodina");
+            Console.WriteLine("normalna hodina");
+
+            if (aktualna.Predmet == "ETV")
+            {
+                Etika(player, aktualna);
+                return;
+            }
             if (aktualna.Predmet != "TSV") //tu som pytala chatgpt co mam spravit lebo nejslo mi najst "aktualna" v tejto metode
             {
                 int chanceTabula = 30;
@@ -291,7 +279,7 @@ namespace Simulator_I.AI
                         if (plus)
                         {
                             correctAnswer = a + b;
-                            Console.WriteLine(aktualna.Ucitel + " vyvolala ta ku tabule! Vypocitaj: " + a + " + " + b);
+                            Console.WriteLine(aktualna.Ucitel + " vovolala ta ku tabule! Vypocitaj: " + a + " + " + b);
                         }
                         else
                         {
@@ -335,25 +323,77 @@ namespace Simulator_I.AI
                     }
                     else
                     {
-                        Console.WriteLine(aktualna.Ucitel + " vyvolal/a ta ku tabule! Vimysli si nieco...");
-                        Console.WriteLine("1. Pytat spoluziakov o pomoc -5e -5m");
-                        Console.WriteLine("2. Vimyslat -10e");
+                        Console.WriteLine(aktualna.Ucitel + " vola ta ku tabule! Vimysli si nieco...");
+                        Console.WriteLine("1. Pytat spoluziakov o pomoc -10e -10m");
+                        Console.WriteLine("2. Vimyslat -15e");
                         Console.WriteLine("3. Povedat ze nevies +5e -15m");
                         Console.ResetColor();
                         string choice = ReadOption("1", "2", "3");
                         if (choice == "1")
                         {
-                            player.ChangeMental(-5);
-                            player.ChangeEnergy(-5);
+                            player.ChangeMental(-10);
+                            player.ChangeEnergy(-10);
+                            int pomocRoll = random.Next(1, 101);
+                            if (pomocRoll <= 50)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Spoluziaci ti poradili spravne! +10e +10m");
+                                player.ChangeMental(10);
+                                player.ChangeEnergy(10);
+                                Console.ResetColor();
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Spoluziaci ti moc nepomohli -10e -10m");
+                                player.ChangeMental(-10);
+                                player.ChangeEnergy(-10);
+                                Console.ResetColor();
+                            }
+                            Console.ResetColor();
                         }
                         else if (choice == "2")
                         {
-                            player.ChangeEnergy(-10);
+                        player.ChangeEnergy(-15);
+                        int vymyslatRoll = random.Next(1, 101);
+                            if (vymyslatRoll <=30)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Improvizácia ti moc nepomohla, dostal si štvorku -20m");
+                                player.ChangeMental(-20);
+                            }
+                            else if (vymyslatRoll <=40)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine("Na trojku si to zvladol");
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Učiteľ sa zasmial a dal ti dvojku +15m +15e");
+                                player.ChangeMental(15);
+                                player.ChangeEnergy(15);
+                            }
+                            Console.ResetColor();
                         }
                         else if (choice == "3")
                         {
                             player.ChangeEnergy(5);
                             player.ChangeMental(-15);
+                            int neviemRoll = random.Next(1, 101);
+                            if (neviemRoll <= 70)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Učiteľ ocenil uprimnost. Mas 5! -30m");
+                                player.ChangeMental(-30);
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Mas šťastie, učitel má dobru naladu. Dnes bez znamky. +25m");
+                                player.ChangeMental(25);
+                                Console.ResetColor();
+                            }
                         }
                     }
                 }
@@ -386,7 +426,7 @@ namespace Simulator_I.AI
         private void Zastup(Player player, Lesson aktualna)
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine(aktualna.Ucitel + " tu nie je - zastup!");
+            Console.WriteLine(aktualna.Ucitel + " chyba - zastup!");
             Console.WriteLine("1. Spat +20 energie 2. Hrat na mobile +20 mentalu");
             Console.ResetColor();
             string volba = ReadOption("1", "2");
@@ -396,10 +436,58 @@ namespace Simulator_I.AI
                 player.ChangeMental(20);
         }
 
+        private void Etika(Player player, Lesson aktualna)
+        {
+            Console.ResetColor();
+            Console.WriteLine("Hodina etiky. Dnešna tema: psychologia");
+            Console.WriteLine("Ucitelka sa pyta otazky:");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Kto je sangvinik?");
+            Console.WriteLine("1. Clovek ktory je spolocensky a optimisticky");
+            Console.WriteLine("2. Clovek, ktory je tichy a uzavrety");
+            Console.ResetColor();
+            string volba = ReadOption("1", "2");
+            if (volba == "1")
+            {
+                Console.WriteLine("Spravna odpoved");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Sangvinik je energický, spoločenský a veselý človek, ktorý sa ľahko prispôsobuje novým veciam a rýchlo sa spriatelí s ľuďmi.");
+                Console.ResetColor();
+            }
+            else if (volba == "2")
+            {
+                Console.WriteLine("Spravna odpoved bola 1");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Sangvinik je energický, spoločenský a veselý človek, ktorý sa ľahko prispôsobuje novým veciam a rýchlo sa spriatelí s ľuďmi.");
+                Console.ResetColor();
+            }
+            Console.WriteLine("Dalšia otazka:");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("čo znamena empatia?");
+            Console.WriteLine("1. Schopnosť presadiť si svoj názor");
+            Console.WriteLine("2. Schopnost pochopit a sdilet pocity ineho cloveka");
+            Console.ResetColor();
+            volba = ReadOption("1", "2");
+            if (volba == "1")
+            {
+                Console.WriteLine("Spravna odpoved bola 1");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Empatia je schopnosť pochopiť a zdieľať pocity, emócie a skúsenosti inej osoby, schopnosť vžiť sa do jej prostredia a pozrieť sa na situáciu z jej pohľadu.");
+                Console.ResetColor();
+            }
+            else if (volba == "2")
+            {
+                Console.WriteLine("Spravna odpoved");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Empatia je schopnosť pochopiť a zdieľať pocity, emócie a skúsenosti inej osoby, schopnosť vžiť sa do jej prostredia a pozrieť sa na situáciu z jej pohľadu.");
+                Console.ResetColor();
+            }
+
+        }
 
     }
 
-       
+
 
 }
 
