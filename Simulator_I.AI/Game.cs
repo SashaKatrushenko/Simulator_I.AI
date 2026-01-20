@@ -11,6 +11,7 @@ namespace Simulator_I.AI
 {
     internal class Game
     {
+        bool demoMode = true;
         private string ReadOption(params string[] validOptions)
         {
             var valid = validOptions.Select(v => v.Trim().ToLower()).ToArray();
@@ -93,9 +94,10 @@ namespace Simulator_I.AI
             {
                 player.Energy = 100;
                 player.Mental = 100;
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("==== DEN: " + den + " ====");
                 Console.ResetColor();
+
                 for (int hod = 1; hod <= 7; hod++)
                 {
                     Lesson aktualna = null;
@@ -112,8 +114,11 @@ namespace Simulator_I.AI
                         Console.WriteLine("Hodina " + hod + "prazdna");
                         continue;
                     }
-                    Console.WriteLine("Hodina " + hod + ": " + aktualna.Predmet);
-                  //  WednesdayPrax(player, den);          (chatgpt) 
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("---Hodina " + hod + ": " + aktualna.Predmet + "---");
+                    Console.ResetColor();
+
+                    //  WednesdayPrax(player, den);          (chatgpt) 
                     if (den == "Streda" && hod <= 6) //prax iba pre prvych 6 hodin
                     {
                         WednesdayPrax(player, den);
@@ -124,8 +129,22 @@ namespace Simulator_I.AI
 
 
 
-                    //EVENTY 
-                    int roll = random.Next(1, 101);
+                    //EVENTY
+
+                   
+                    if (demoMode)
+                    {
+                        Console.WriteLine("DEMO: 1-Test 2-DU 3-Normalna hodina 4-Zastup");            //Demo mode
+                        Console.ResetColor();
+                        string demoChoice = ReadOption("1", "2", "3", "4");
+                        if (demoChoice == "1") Test(player, aktualna, random);
+                        else if (demoChoice == "2") DU(player, random, aktualna);
+                        else if (demoChoice == "3") Nic(player, aktualna, random);
+                        else if (demoChoice == "4") Zastup(player, aktualna);
+                    }
+                    else
+                    {                                                                             //Normal Mode
+                        int roll = random.Next(1, 101);
                     if (roll <= aktualna.ChanceTest)
                     {
                         Test(player, aktualna, random);
@@ -141,6 +160,7 @@ namespace Simulator_I.AI
                     else
                     {
                         Zastup(player, aktualna);
+                    }
                     }
                     player.ChangeEnergy(-5);
                     Console.WriteLine("Player energy: " + player.Energy);
@@ -195,13 +215,17 @@ namespace Simulator_I.AI
                 int chanceZnamka1 = random.Next(1, 100);
                 if (chanceZnamka1 <= 70)
                 {
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Dostavas dobru znamku! +20 mental");
                     player.ChangeMental(20);
+                    Console.ResetColor();
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Dostavas zlu znamku! (-20 mental)");
                     player.ChangeMental(-20);
+                    Console.ResetColor();
                 }
             }
             if (volba == "2")
@@ -209,13 +233,17 @@ namespace Simulator_I.AI
                 int chanceZnamka = random.Next(1, 100);
                 if (chanceZnamka <= 30)
                 {
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Dostavas dobru znamku! +20 mental");
                     player.ChangeMental(20);
+                    Console.ResetColor();
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Dostavas zlu znamku! (-20 mental)");
                     player.ChangeMental(-20);
+                    Console.ResetColor();
                 }
             }
         }
@@ -265,12 +293,17 @@ namespace Simulator_I.AI
 
         private void Nic(Player player, Lesson aktualna, Random random)
         {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("normalna hodina");
+         //   Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Normalna hodina");
 
             if (aktualna.Predmet == "ETV")
             {
                 Etika(player, aktualna);
+                return;
+            }
+            if (aktualna.Predmet == "TSV")
+            {
+                Telesna(player, aktualna, random);
                 return;
             }
             if (aktualna.Predmet != "TSV")
@@ -347,7 +380,7 @@ namespace Simulator_I.AI
                             if (pomocRoll <= 50)
                             {
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Spoluziaci ti poradili spravne! +10e +10m");
+                                Console.WriteLine("Spoluziaci ti pomohli! +10e +10m");
                                 player.ChangeMental(10);
                                 player.ChangeEnergy(10);
                                 Console.ResetColor();
@@ -355,7 +388,7 @@ namespace Simulator_I.AI
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("Spoluziaci ti moc nepomohli -10e -10m");
+                                Console.WriteLine("Spoluziaci ti poradili zle -10e -10m");
                                 player.ChangeMental(-10);
                                 player.ChangeEnergy(-10);
                                 Console.ResetColor();
@@ -409,24 +442,34 @@ namespace Simulator_I.AI
                 }
                 else
                 {
-                    Console.WriteLine("1. Davat pozor (-5e +10m)");
-                    Console.WriteLine("2. Kreslit do zosita (+5e -5m)");
-                    Console.WriteLine("3. Bavit sa so spoluziakmi (+10e -10m)");
+                    Console.WriteLine("1. Pisať poznamky (-10e +10m)");
+                    Console.WriteLine("2. Kresliť do zosita (+10e -10m)");
+                    Console.WriteLine("3. Ketcať so spolužiakmi (+10e)");
                     string volba = ReadOption("1", "2", "3");
                     if (volba == "1")
                     {
-                        player.ChangeEnergy(-5);
+                        player.ChangeEnergy(-10);
                         player.ChangeMental(10);
                     }
                     else if (volba == "2")
                     {
-                        player.ChangeEnergy(5);
-                        player.ChangeMental(-5);
+                        player.ChangeEnergy(10);
+                        player.ChangeMental(-10);
                     }
                     else if (volba == "3")
                     {
-                        player.ChangeEnergy(10);
-                        player.ChangeMental(-10);
+                        int poznamkaRoll = random.Next(1, 101);
+                        if (poznamkaRoll <= 30)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Ucitel vas prichytil! Maš poznamku (-30m)");
+                            player.ChangeMental(-30);
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            player.ChangeEnergy(10);
+                        }
                     }
                 }
             }
@@ -493,6 +536,109 @@ namespace Simulator_I.AI
                 Console.ResetColor();
             }
 
+        }
+
+        private void Telesna(Player player, Lesson aktualna, Random random)
+        {
+            int sportRoll = random.Next(1, 101);
+            if (sportRoll <= 50)
+            {
+                Console.WriteLine("Dnes behate okolo školy.");
+                Console.WriteLine("1. Bežať naplno");
+                Console.WriteLine("2. Bežať pomaly");
+                Console.WriteLine("3. Nezučastniť sa");
+                string volba = ReadOption("1", "2", "3");
+                if (volba == "1")
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    player.ChangeEnergy(-20);
+                    player.ChangeMental(20);
+                    Console.WriteLine("Dobry vykon, Drexler je spokojny (+20m)");
+                    Console.ResetColor();
+                }
+                else if (volba == "2")
+                {
+                    player.ChangeEnergy(-10);
+                    player.ChangeMental(5);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Priemerny vykon (+5m)");
+                    Console.ResetColor();
+                }
+                else if (volba == "3")
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Slaby vykon, zla znamka (-20m)");
+                    player.ChangeMental(-20);
+                    Console.ResetColor();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Hodina telesnej. Dnes hrate futbal.");
+                Console.WriteLine("1. Snažiť sa -15e");
+                Console.WriteLine("2. Stať v brane -10e");
+                Console.WriteLine("3. Flakať sa");
+                string volba = ReadOption("1", "2", "3");
+                if (volba == "1")
+                {
+                    int futbalRoll = random.Next(1, 101);
+                    if (futbalRoll <= 85)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Vyhrali ste (-15e +20m)");
+                        player.ChangeEnergy(-15);
+                        player.ChangeMental(20);
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Nedari sa ti, tvoj tím prehral (-15e -10m)");
+                        player.ChangeEnergy(-15);
+                        player.ChangeMental(-10);
+                        Console.ResetColor();
+                    }
+                }
+                else if (volba == "2")
+                {
+                    int futbalRoll = random.Next(1, 101);
+                    if (futbalRoll <= 50)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Vyhrali ste (-10e +20m)");
+                        player.ChangeEnergy(-10);
+                        player.ChangeMental(10);
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Nedari sa ti, tvoj tím prehral (-10e -5m)");
+                        player.ChangeEnergy(-10);
+                        player.ChangeMental(-5);
+                        Console.ResetColor();
+                    }
+                }
+                else if (volba == "3")
+                {
+                    int futbalRoll = random.Next(1, 101);
+                    if (futbalRoll <= 20)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Vyhrali ste aj tak (+20m)");
+                        player.ChangeMental(5);
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Kvôli tebe tvoj tím prehral (-20m)");
+                        player.ChangeMental(-20);
+                        Console.ResetColor();
+                        Console.ResetColor();
+                    }
+                }
+            }
         }
 
 
