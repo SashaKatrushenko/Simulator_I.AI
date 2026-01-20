@@ -113,6 +113,16 @@ namespace Simulator_I.AI
                         continue;
                     }
                     Console.WriteLine("Hodina " + hod + ": " + aktualna.Predmet);
+                  //  WednesdayPrax(player, den);          (chatgpt) 
+                    if (den == "Streda" && hod <= 6) //prax iba pre prvych 6 hodin
+                    {
+                        WednesdayPrax(player, den);
+                        player.ChangeEnergy(-5);
+                        WaitForEnter();
+                        continue;
+                    }
+
+
 
                     //EVENTY 
                     int roll = random.Next(1, 101);
@@ -263,7 +273,7 @@ namespace Simulator_I.AI
                 Etika(player, aktualna);
                 return;
             }
-            if (aktualna.Predmet != "TSV") //tu som pytala chatgpt co mam spravit lebo nejslo mi najst "aktualna" v tejto metode
+            if (aktualna.Predmet != "TSV")
             {
                 int chanceTabula = 30;
                 int tabulaRoll = random.Next(1, 101);
@@ -384,8 +394,8 @@ namespace Simulator_I.AI
                             if (neviemRoll <= 70)
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("Učiteľ ocenil uprimnost. Mas 5! -30m");
-                                player.ChangeMental(-30);
+                                Console.WriteLine("Učiteľ ocenil uprimnost. Mas 5! -25m");
+                                player.ChangeMental(-25);
                             }
                             else
                             {
@@ -484,6 +494,61 @@ namespace Simulator_I.AI
             }
 
         }
+
+
+        //Praca Davida
+        private void WednesdayPrax(Player player, string den)
+        {
+            if (den != "Streda")
+                return;
+
+            int r = random.Next(1, 101);
+
+            if (r <= 75)
+            {
+                Console.ForegroundColor= ConsoleColor.Blue;
+                Console.WriteLine("Mas internet na hodine.");
+                Console.WriteLine("1. Ucit sa nove veci (+20m -20e)");
+                Console.WriteLine("2. Nedavat pozor (-20m +20e)");
+                Console.ResetColor();
+
+                string volba = ReadOption("1", "2");
+
+                if (volba == "1")
+                {
+                    player.ChangeMental(20);
+                    player.ChangeEnergy(-20);
+                }
+                if (volba == "2")
+                {
+                    player.ChangeMental(-20);
+                    player.ChangeEnergy(20);
+                }
+
+            }
+            else
+            {
+                Console.ForegroundColor=ConsoleColor.Green;
+                Console.WriteLine("Internet dnes nefunguje.");
+                Console.WriteLine("1. Spat (+20e -20m) ");
+                Console.WriteLine("2. Byt na mobile(+20m -20e");
+                Console.ResetColor();
+
+                string volba = ReadOption("1", "2");
+
+                if (volba == "1")
+                {
+                    player.ChangeMental(-20);
+                    player.ChangeEnergy(20);
+                }
+                if (volba == "2")
+                {
+                    player.ChangeMental(20);
+                    player.ChangeEnergy(-20);
+                }
+            }
+        }
+
 
     }
 
